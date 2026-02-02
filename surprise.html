@@ -20,19 +20,18 @@
 
         #container {
             background: white;
-            padding: 2rem;
+            padding: 3rem 2rem; /* Un peu plus d'espace en haut et en bas */
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            max-width: 90%; /* S'adapte mieux aux petits écrans */
+            max-width: 90%;
         }
 
-        h1 { color: #d63384; font-size: 1.8rem; margin: 20px 0; }
+        h1 { color: #d63384; font-size: 2rem; margin: 0 0 30px 0; }
 
         .buttons {
-            margin-top: 20px;
             display: flex;
             justify-content: center;
-            gap: 20px; /* Espace entre les boutons */
+            gap: 20px;
             position: relative;
             min-height: 60px;
         }
@@ -41,10 +40,11 @@
             padding: 12px 24px;
             font-size: 1.1rem;
             border: none;
-            border-radius: 50px; /* Boutons plus ronds */
+            border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: bold;
+            z-index: 10; /* S'assure que les boutons sont au-dessus */
         }
 
         #yesBtn {
@@ -58,15 +58,26 @@
             background-color: #e9ecef;
             color: #495057;
         }
-        /* Le bouton "Non" ne devient absolu qu'au survol pour bouger */
+        
+        /* Le bouton "Non" passe en position absolue pour pouvoir bouger librement */
         #noBtn.moving {
             position: absolute;
         }
 
-        img { width: 100%; max-width: 250px; border-radius: 15px; }
+        /* Style pour l'image de fin uniquement */
+        #container img { width: 100%; max-width: 250px; border-radius: 15px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
+
+    <div id="container">
+        <h1>Clémence, will you be my valentine ? ❤️</h1>
+        
+        <div class="buttons">
+            <button id="yesBtn">Oui ! 😍</button>
+            <button id="noBtn">Non 😢</button>
+        </div>
+    </div>
 
     <audio id="bgMusic" loop>
         <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
@@ -81,15 +92,18 @@
 
         // Fonction pour faire bouger le bouton "Non"
         function moveButton() {
-            noBtn.classList.add('moving'); // Active la position absolue
+            // On ajoute la classe qui permet le mouvement absolu
+            noBtn.classList.add('moving');
             
-            // Calcul pour garder le bouton dans la fenêtre
-            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
-            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+            // Calcul de la zone disponible (fenêtre moins la taille du bouton et une marge)
+            const maxX = window.innerWidth - noBtn.offsetWidth - 30;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 30;
             
-            const newX = Math.random() * maxX + 10;
-            const newY = Math.random() * maxY + 10;
+            // Génère une position aléatoire
+            const newX = Math.max(10, Math.random() * maxX);
+            const newY = Math.max(10, Math.random() * maxY);
             
+            // Applique la nouvelle position
             noBtn.style.left = `${newX}px`;
             noBtn.style.top = `${newY}px`;
         }
@@ -103,27 +117,24 @@
 
         // Action sur le bouton "Oui"
         yesBtn.addEventListener('click', () => {
-            // Lance la musique (nécessite une interaction de l'utilisateur)
+            // Lance la musique
             music.play().catch(e => console.log("Lecture auto bloquée : " + e));
 
+            // Change le contenu de la boîte. 
+            // NOTE : J'ai laissé le GIF de fin ici. Si tu veux l'enlever aussi, dis-le moi !
             container.innerHTML = `
                 <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1bmN6amR2ZzR3eXN4eXN4eXN4eXN4eXN4eXN4eXN4eXN4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/c76IJLufpN762clLOM/giphy.gif" alt="Happy cat">
                 <h1>YAY ! Trop hâte d'y être ! 🥰💖</h1>
                 <p style="font-size: 1.1rem; color: #666;">Prépare-toi pour une super soirée !</p>
             `;
             
-            // Grosse explosion de confettis
+            // Confettis
             confetti({
                 particleCount: 200,
                 spread: 100,
                 origin: { y: 0.6 },
                 colors: ['#ff4d6d', '#ff8fa3', '#ffffff']
             });
-
-            // Une deuxième vague de confettis pour le fun
-            setTimeout(() => {
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.7 } });
-            }, 500);
         });
     </script>
 </body>
