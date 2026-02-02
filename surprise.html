@@ -10,11 +10,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             background-color: #ffeef2;
             font-family: 'Arial', sans-serif;
             text-align: center;
+            overflow: hidden; /* Empêche de scroller quand le bouton bouge */
         }
 
         #container {
@@ -22,77 +23,117 @@
             padding: 2rem;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 90%; /* S'adapte mieux aux petits écrans */
         }
 
-        h1 { color: #d63384; font-size: 2rem; }
+        h1 { color: #d63384; font-size: 1.8rem; margin: 20px 0; }
 
         .buttons {
             margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Espace entre les boutons */
             position: relative;
-            height: 100px;
+            min-height: 60px;
         }
 
         button {
-            padding: 15px 30px;
-            font-size: 1.2rem;
+            padding: 12px 24px;
+            font-size: 1.1rem;
             border: none;
-            border-radius: 10px;
+            border-radius: 50px; /* Boutons plus ronds */
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            font-weight: bold;
         }
 
         #yesBtn {
             background-color: #ff4d6d;
             color: white;
-            margin-right: 10px;
+            box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3);
         }
+        #yesBtn:hover { transform: scale(1.05); background-color: #e0435f; }
 
         #noBtn {
-            background-color: #6c757d;
-            color: white;
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        /* Le bouton "Non" ne devient absolu qu'au survol pour bouger */
+        #noBtn.moving {
             position: absolute;
         }
 
-        img { width: 200px; border-radius: 10px; }
+        img { width: 100%; max-width: 250px; border-radius: 15px; }
     </style>
 </head>
 <body>
 
     <div id="container">
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1bmN6amR2ZzR3eXN4eXN4eXN4eXN4eXN4eXN4eXN4eXN4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/c76IJLufpN762clLOM/giphy.gif" alt="Cute cat">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbWp6amR2ZzR3eXN4eXN4eXN4eXN4eXN4eXN4eXN4eXN4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/KztT2c4u8mYYUiMKdZ/giphy.gif" alt="Cute cat">
         <h1>Clémence, will you be my valentine ? ❤️</h1>
         
         <div class="buttons">
-            <button id="yesBtn">Oui !</button>
-            <button id="noBtn">Non</button>
+            <button id="yesBtn">Oui ! 😍</button>
+            <button id="noBtn">Non 😢</button>
         </div>
     </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
+        const container = document.getElementById('container');
+        const music = document.getElementById('bgMusic');
 
-        // Faire fuir le bouton "Non"
-        noBtn.addEventListener('mouseover', () => {
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+        // Fonction pour faire bouger le bouton "Non"
+        function moveButton() {
+            noBtn.classList.add('moving'); // Active la position absolue
             
-            noBtn.style.left = `${x}px`;
-            noBtn.style.top = `${y}px`;
+            // Calcul pour garder le bouton dans la fenêtre
+            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+            
+            const newX = Math.random() * maxX + 10;
+            const newY = Math.random() * maxY + 10;
+            
+            noBtn.style.left = `${newX}px`;
+            noBtn.style.top = `${newY}px`;
+        }
+
+        // Bouge au survol (PC) et au toucher (Mobile)
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Empêche le clic
+            moveButton();
         });
 
         // Action sur le bouton "Oui"
         yesBtn.addEventListener('click', () => {
-            document.querySelector('#container').innerHTML = `
-                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbWp6amR2ZzR3eXN4eXN4eXN4eXN4eXN4eXN4eXN4eXN4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/KztT2c4u8mYYUiMKdZ/giphy.gif">
-                <h1>YAY ! On se voit le 14 ! 🥰</h1>
+            // Lance la musique (nécessite une interaction de l'utilisateur)
+            music.play().catch(e => console.log("Lecture auto bloquée : " + e));
+
+            container.innerHTML = `
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1bmN6amR2ZzR3eXN4eXN4eXN4eXN4eXN4eXN4eXN4eXN4JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/c76IJLufpN762clLOM/giphy.gif" alt="Happy cat">
+                <h1>YAY ! Trop hâte d'y être ! 🥰💖</h1>
+                <p style="font-size: 1.1rem; color: #666;">Prépare-toi pour une super soirée !</p>
             `;
+            
+            // Grosse explosion de confettis
             confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 }
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#ff4d6d', '#ff8fa3', '#ffffff']
             });
+
+            // Une deuxième vague de confettis pour le fun
+            setTimeout(() => {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.7 } });
+            }, 500);
         });
     </script>
 </body>
